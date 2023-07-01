@@ -1,6 +1,5 @@
 package ru.com.bulat.recycleviewbasic.model
 
-import android.icu.util.ULocale
 import com.github.javafaker.Faker
 import java.util.Collections
 
@@ -15,12 +14,12 @@ class UsersService {
     init {
         val faker = Faker.instance()
         IMAGES.shuffle()
-        val generatedUsers : List <User> = (0..100).map {User(
+        users = (0..100).map {User(
             id = it.toLong(),
             photo = IMAGES[it % IMAGES.size],
             name = faker.name().name(),
             company = faker.company().name()
-        )}
+        )}.toMutableList()
     }
 
     fun getUser() : List<User>{
