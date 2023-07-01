@@ -1,3 +1,7 @@
 <resources>
     <string name="app_name">RecycleViewBasic</string>
+
+    <string name="move_up">Move Up</string>
+    <string name="move_down">Move Down</string>
+    <string name="move_rempve">Remove</string>
 </resources>
