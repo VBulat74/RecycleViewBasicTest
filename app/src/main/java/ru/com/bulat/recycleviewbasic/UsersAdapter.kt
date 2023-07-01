@@ -1,8 +1,10 @@
 package ru.com.bulat.recycleviewbasic
 
 import android.view.LayoutInflater
+import android.view.Menu
 import android.view.View
 import android.view.ViewGroup
+import androidx.appcompat.widget.PopupMenu
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import ru.com.bulat.recycleviewbasic.databinding.ItemUserBinding
@@ -30,12 +32,45 @@ class UsersAdapter(
 
         when (v.id) {
             R.id.moreImageViewButton -> {
-
+                showPopupMenu(v)
             }
             else -> {
                 actionListener.onUserDetails(user)
             }
         }
+    }
+
+    private fun showPopupMenu(view: View) {
+        val popupMenu = PopupMenu (view.context, view)
+        val context = view.context
+        val user:User = view.tag as User
+        val position = users.indexOfFirst { it.id == user.id }
+
+        popupMenu.menu.add(0, ID_MOVE_UP, Menu.NONE, context.getString(R.string.move_up)).apply {
+            isEnabled = position > 0
+        }
+
+        popupMenu.menu.add(0, ID_MOVE_DOWN, Menu.NONE, context.getString(R.string.move_down)).apply {
+            isEnabled = position < users.size-1
+        }
+        popupMenu.menu.add(0, ID_MOVE_REMOVE, Menu.NONE, context.getString(R.string.move_rempve))
+
+        popupMenu.setOnMenuItemClickListener {item->
+            when (item.itemId) {
+                ID_MOVE_UP -> {
+                    actionListener.onUserMove(user, 1)
+                }
+                ID_MOVE_DOWN -> {
+                    actionListener.onUserMove(user, -1)
+                }
+                ID_MOVE_REMOVE -> {
+                    actionListener.onUserDelete(user)
+                }
+            }
+            return@setOnMenuItemClickListener true
+        }
+
+        popupMenu.show()
     }
 
     override fun onBindViewHolder(holder: UsersViewHolder, position: Int) {
@@ -74,4 +109,10 @@ class UsersAdapter(
     class UsersViewHolder (
         val binding: ItemUserBinding
     ) : RecyclerView.ViewHolder (binding.root)
+
+    companion object {
+        private const val ID_MOVE_UP = 1
+        private const val ID_MOVE_DOWN = 2
+        private const val ID_MOVE_REMOVE = 3
+    }
 }
