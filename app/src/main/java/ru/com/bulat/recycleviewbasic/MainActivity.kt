@@ -3,6 +3,7 @@ package ru.com.bulat.recycleviewbasic
 import android.os.Bundle
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.LinearLayoutManager
 import ru.com.bulat.recycleviewbasic.databinding.ActivityMainBinding
 import ru.com.bulat.recycleviewbasic.model.User
@@ -36,10 +37,18 @@ class MainActivity : AppCompatActivity() {
                 Toast.makeText(this@MainActivity, "User: ${user.name}", Toast.LENGTH_SHORT).show()
             }
 
+            override fun onUserFire(user: User) {
+                usersService.fireUser(user)
+            }
+
         })
         val linearLayoutManager = LinearLayoutManager(this)
         binding.recycleView.layoutManager = linearLayoutManager
         binding.recycleView.adapter = adapter
+        val itemAnimator = binding.recycleView.itemAnimator
+        if (itemAnimator is DefaultItemAnimator) {
+            itemAnimator.supportsChangeAnimations = false
+        }
 
         usersService.addListener(userListener)
     }
