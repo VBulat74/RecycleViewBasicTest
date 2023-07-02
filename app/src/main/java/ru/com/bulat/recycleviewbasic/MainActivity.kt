@@ -7,58 +7,40 @@ import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.LinearLayoutManager
 import ru.com.bulat.recycleviewbasic.databinding.ActivityMainBinding
 import ru.com.bulat.recycleviewbasic.model.User
-import ru.com.bulat.recycleviewbasic.model.UserListener
+import ru.com.bulat.recycleviewbasic.model.UsersListener
 import ru.com.bulat.recycleviewbasic.model.UsersService
+import ru.com.bulat.recycleviewbasic.screens.UserDetailsFragment
+import ru.com.bulat.recycleviewbasic.screens.UserListFragment
+import java.util.function.ToIntBiFunction
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : AppCompatActivity(), Navigator {
 
     private lateinit var binding: ActivityMainBinding
-    private lateinit var adapter: UsersAdapter
-
-    private val usersService: UsersService
-        get() = (applicationContext as App).usersService
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        adapter = UsersAdapter(object : UserActionListener{
-            override fun onUserMove(user: User, moveBy: Int) {
-                usersService.moveUser(user,-moveBy)
-            }
-
-            override fun onUserDelete(user: User) {
-                usersService.deleteUser(user)
-            }
-
-            override fun onUserDetails(user: User) {
-                Toast.makeText(this@MainActivity, "User: ${user.name}", Toast.LENGTH_SHORT).show()
-            }
-
-            override fun onUserFire(user: User) {
-                usersService.fireUser(user)
-            }
-
-        })
-        val linearLayoutManager = LinearLayoutManager(this)
-        binding.recycleView.layoutManager = linearLayoutManager
-        binding.recycleView.adapter = adapter
-        val itemAnimator = binding.recycleView.itemAnimator
-        if (itemAnimator is DefaultItemAnimator) {
-            itemAnimator.supportsChangeAnimations = false
+        if (savedInstanceState == null) {
+            supportFragmentManager.beginTransaction()
+                .add(R.id.fragmentContainer, UserListFragment())
+                .commit()
         }
-
-        usersService.addListener(userListener)
     }
 
-    private val userListener:UserListener = {
-        adapter.users = it
+    override fun showDetails(user: User) {
+        supportFragmentManager.beginTransaction()
+            .addToBackStack(null)
+            .replace(R.id.fragmentContainer, UserDetailsFragment.newInstance(user.id))
+            .commit()
     }
 
-    override fun onDestroy() {
-        super.onDestroy()
-        usersService.removeListener(userListener)
+    override fun goBack() {
+        onBackPressed()
+    }
+
+    override fun toast(messageRes: Int) {
+        Toast.makeText(this, messageRes, Toast.LENGTH_SHORT).show()
     }
 }

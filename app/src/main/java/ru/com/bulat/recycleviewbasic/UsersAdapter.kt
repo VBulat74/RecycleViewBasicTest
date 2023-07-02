@@ -82,10 +82,10 @@ class UsersAdapter(
         popupMenu.setOnMenuItemClickListener {item->
             when (item.itemId) {
                 ID_MOVE_UP -> {
-                    actionListener.onUserMove(user, 1)
+                    actionListener.onUserMove(user, -1)
                 }
                 ID_MOVE_DOWN -> {
-                    actionListener.onUserMove(user, -1)
+                    actionListener.onUserMove(user, 1)
                 }
                 ID_REMOVE -> {
                     actionListener.onUserDelete(user)

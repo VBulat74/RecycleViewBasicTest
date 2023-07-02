@@ -1,70 +1,83 @@
 package ru.com.bulat.recycleviewbasic.model
 
 import com.github.javafaker.Faker
+import ru.com.bulat.recycleviewbasic.UserNotFoundException
 import java.util.Collections
 
-typealias UserListener = (users: List<User>) -> Unit
+typealias UsersListener = (users: List<User>) -> Unit
 
 class UsersService {
 
-    private var users  = mutableListOf<User>()
+    private var users = mutableListOf<User>()
 
-    private val listeners = mutableListOf<UserListener>()
+    private val listeners = mutableListOf<UsersListener>()
 
     init {
         val faker = Faker.instance()
         IMAGES.shuffle()
-        users = (0..100).map {User(
-            id = it.toLong(),
-            photo = IMAGES[it % IMAGES.size],
-            name = faker.name().name(),
-            company = faker.company().name()
-        )}.toMutableList()
+        users = (0..100).map {
+            User(
+                id = it.toLong(),
+                photo = IMAGES[it % IMAGES.size],
+                name = faker.name().name(),
+                company = faker.company().name()
+            )
+        }.toMutableList()
     }
 
-    fun getUser() : List<User>{
+    fun getUser(): List<User> {
         return users
     }
 
-    fun deleteUser (user: User) {
+    fun getById(id: Long): UserDetails {
+
+        val user: User = users.firstOrNull { it.id == id } !!
+
+        return UserDetails(
+            user,
+            Faker.instance().lorem().paragraphs(3).joinToString("\n\n")
+        )
+    }
+
+    fun deleteUser(user: User) {
         val indexToDelete = users.indexOfFirst { it.id == user.id }
-        if (indexToDelete != -1){
-            users = ArrayList (users)
+        if (indexToDelete != -1) {
+            users = ArrayList(users)
             users.removeAt(indexToDelete)
             notifyChanges()
         }
 
     }
 
-    fun fireUser(user: User){
+    fun fireUser(user: User) {
         val indexToFire = users.indexOfFirst { it.id == user.id }
         if (indexToFire == -1) return
         val updateUser = users[indexToFire].copy(company = "")
-        users = ArrayList (users)
+        users = ArrayList(users)
         users[indexToFire] = updateUser
         notifyChanges()
     }
 
-    fun moveUser (user: User, moveBy:Int) {
+    fun moveUser(user: User, moveBy: Int) {
         val oldIndex = users.indexOfFirst { it.id == user.id }
         if (oldIndex == -1) return
         val newIndex = moveBy + oldIndex
-        if (newIndex <0 || newIndex >= users.size) return
-        users = ArrayList (users)
+        if (newIndex < 0 || newIndex >= users.size) return
+        users = ArrayList(users)
         Collections.swap(users, oldIndex, newIndex)
         notifyChanges()
     }
 
-    fun addListener (listener: UserListener) {
-        listeners.add (listener)
+    fun addListener(listener: UsersListener) {
+        listeners.add(listener)
         listener.invoke(users)
     }
 
-    fun removeListener (listener: UserListener) {
-        listeners.remove (listener)
+    fun removeListener(listener: UsersListener) {
+        listeners.remove(listener)
     }
 
-    private fun notifyChanges(){
+    private fun notifyChanges() {
         listeners.forEach { it.invoke(users) }
     }
 
@@ -81,6 +94,6 @@ class UsersService {
             "https://images.unsplash.com/photo-1567186937675-a5131c8a89ea?crop=entropy&cs=tinysrgb&fit=crop&fm=jpg&h=600&ixid=MnwxfDB8MXxyYW5kb218fHx8fHx8fHwxNjI0MDE0ODYx&ixlib=rb-1.2.1&q=80&utm_campaign=api-credit&utm_medium=referral&utm_source=unsplash_source&w=800",
             "https://images.unsplash.com/photo-1546456073-92b9f0a8d413?crop=entropy&cs=tinysrgb&fit=crop&fm=jpg&h=600&ixid=MnwxfDB8MXxyYW5kb218fHx8fHx8fHwxNjI0MDE0ODY1&ixlib=rb-1.2.1&q=80&utm_campaign=api-credit&utm_medium=referral&utm_source=unsplash_source&w=800",
 
-        )
+            )
     }
 }

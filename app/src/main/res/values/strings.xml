@@ -7,4 +7,8 @@
 
     <string name="fire">Fire</string>
     <string name="unemployed">[Unemployed]</string>
+    <string name="faild_to_load_users">Faild to load users</string>
+    <string name="try_again">Try Again</string>
+    <string name="no_usesrs">No usesrs!</string>
+    <string name="user_has_been_deleted">User has been deleted</string>
 </resources>
